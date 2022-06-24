@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.sql.DataSource;
 
@@ -27,8 +28,6 @@ import javax.sql.DataSource;
 @EnableBatchProcessing
 public class BatchConfiguration {
 
-    @Autowired
-    public JobBuilderFactory jobBuilderFactory;
 
     @Autowired
     public StepBuilderFactory stepBuilderFactory;
@@ -77,19 +76,9 @@ public class BatchConfiguration {
                 .build();
     }
 
-    @Bean
-    public Job importVoltageJob(NotificationListener listener, Step step1) {
-        return jobBuilderFactory.get("importVoltageJob")
-                .incrementer(new RunIdIncrementer())
-                .listener(listener)
-                .flow(step1)
-                .end()
-                .build();
-    }
-
-    @Bean
-    public Step step1(JdbcBatchItemWriter<Voltage> writer) {
-        return stepBuilderFactory.get("step1")
+    @Bean("stepTable1")
+    public Step stepTable1(JdbcBatchItemWriter<Voltage> writer) {
+        return stepBuilderFactory.get("stepTable1")
                 .<Voltage, Voltage> chunk(10)
                 .reader(reader())
                 .processor(processor())
